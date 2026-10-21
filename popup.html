@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Vocab Lock</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="popup">
+  <header class="p-head">
+    <img src="icons/icon32.png" alt="">
+    <span class="name">Vocab Lock</span>
+    <label class="sw" title="Bật/tắt hỏi ngẫu nhiên">
+      <span>Tự hỏi</span>
+      <span class="toggle"><input type="checkbox" id="enabled" aria-label="Bật hỏi ngẫu nhiên"><span class="track"></span></span>
+    </label>
+  </header>
+
+  <main class="p-body">
+    <section class="metrics">
+      <div class="metric"><div class="n" id="cTotal">0</div><div class="l">Tổng số từ</div></div>
+      <div class="metric"><div class="n" id="cLearning">0</div><div class="l">Đang học</div></div>
+      <div class="metric"><div class="n" id="cLearned">0</div><div class="l">Đã thuộc</div></div>
+    </section>
+
+    <div class="smsg neutral" id="status"><span data-icon="clock"></span><div id="next"></div></div>
+
+    <form id="addForm" class="p-form" autocomplete="off">
+      <div class="field">
+        <label class="flabel" for="en">Từ tiếng Anh</label>
+        <div class="tf"><input id="en" spellcheck="false" placeholder="vd: ubiquitous"></div>
+      </div>
+      <div class="pron" id="pron" hidden>
+        <button class="spk" id="spk" type="button" title="Nghe phát âm (nhấn lần nữa để nghe chậm)" aria-label="Nghe phát âm"></button>
+        <span class="ipa" id="ipa"></span>
+        <span class="reading" id="reading"></span>
+      </div>
+      <div class="field">
+        <label class="flabel" for="vi">Nghĩa tiếng Việt</label>
+        <div class="tf"><input id="vi" placeholder="Nhiều nghĩa cách nhau bằng dấu phẩy"></div>
+      </div>
+      <div class="field">
+        <label class="flabel" for="note">Ghi chú <span class="opt">(không bắt buộc)</span></label>
+        <div class="tf"><textarea id="note" rows="2" placeholder="Ghi chú riêng của bạn (Enter để xuống dòng)"></textarea></div>
+      </div>
+      <div class="aipanel" id="aiPanel" hidden></div>
+      <div id="addMsg" class="imsg"></div>
+      <div class="actions">
+        <span class="grow"><button class="btn discovery" id="aiBtn" type="button" hidden><span data-icon="sparkles"></span><span>Gợi ý bằng AI</span></button></span>
+        <button class="btn primary" type="submit">Lưu từ</button>
+      </div>
+    </form>
+
+    <div class="p-foot">
+      <button id="quizNow" class="btn" type="button"><span data-icon="play"></span><span>Hỏi thử ngay</span></button>
+      <button id="openOptions" class="btn subtle" type="button"><span data-icon="sliders"></span><span>Quản lý</span></button>
+    </div>
+
+    <p class="tip">Mẹo: bôi đen từ trên trang → chuột phải → <b>Lưu vào Vocab Lock</b>, hoặc nhấn <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>.</p>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

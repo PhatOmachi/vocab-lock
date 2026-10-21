@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vocab Lock – Quản lý</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body class="options">
+  <header class="topnav">
+    <img src="icons/icon48.png" alt="">
+    <span class="name">Vocab Lock</span>
+    <span class="sep"></span>
+    <span class="crumb">Học từ vựng tiếng Anh trong lúc lướt web</span>
+  </header>
+
+  <div class="layout">
+    <nav class="sidenav" aria-label="Điều hướng">
+      <div class="group">Học tập</div>
+      <button class="nav-item" data-page="words"><span data-icon="book"></span>Từ vựng</button>
+      <div class="group">Cấu hình</div>
+      <button class="nav-item" data-page="settings"><span data-icon="sliders"></span>Cài đặt chung</button>
+      <button class="nav-item" data-page="ai"><span data-icon="sparkles"></span>AI &amp; giọng nói<span class="lz discovery" id="navAiLz">Tuỳ chọn</span></button>
+      <button class="nav-item" data-page="sync"><span data-icon="sync"></span>Nhập &amp; đồng bộ</button>
+    </nav>
+
+    <main class="content">
+      <!-- ================= TỪ VỰNG ================= -->
+      <section class="page" id="page-words" hidden>
+        <div class="crumbs">Vocab Lock / Từ vựng</div>
+        <div class="page-head">
+          <div><h1 class="h1">Từ vựng</h1><p class="page-desc">Danh sách các từ bạn đã lưu và tiến độ học của từng từ.</p></div>
+          <button class="btn primary" id="goBulk" type="button"><span data-icon="plus"></span><span>Thêm nhiều từ</span></button>
+        </div>
+        <div class="metrics" style="max-width:560px">
+          <div class="metric"><div class="n" id="cTotal">0</div><div class="l">Tổng số từ</div></div>
+          <div class="metric"><div class="n" id="cLearning">0</div><div class="l">Đang học</div></div>
+          <div class="metric"><div class="n" id="cLearned">0</div><div class="l">Đã thuộc</div></div>
+        </div>
+        <div class="toolbar">
+          <div class="tabs" id="filter" role="tablist">
+            <button class="tab on" data-f="all" role="tab">Tất cả<span class="count" id="tAll"></span></button>
+            <button class="tab" data-f="learning" role="tab">Đang học<span class="count" id="tLearning"></span></button>
+            <button class="tab" data-f="learned" role="tab">Đã thuộc<span class="count" id="tLearned"></span></button>
+          </div>
+          <div class="tf compact"><span class="lead" data-icon="search"></span><input id="search" type="search" placeholder="Tìm từ hoặc nghĩa"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Từ</th><th>Nghĩa</th><th>Đúng / Sai</th><th>Trạng thái</th><th></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+          <div id="empty" class="empty" hidden></div>
+        </div>
+      </section>
+
+      <!-- ================= CÀI ĐẶT CHUNG ================= -->
+      <section class="page" id="page-settings" hidden>
+        <div class="crumbs">Vocab Lock / Cấu hình</div>
+        <div class="page-head"><div><h1 class="h1">Cài đặt chung</h1><p class="page-desc">Thay đổi được lưu tự động.</p></div></div>
+        <div class="stack">
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Lịch hỏi</h2><p class="small subtlest">Màn hình hỏi sẽ khóa tất cả các tab cho tới khi bạn trả lời đúng.</p></div>
+            <div class="setting">
+              <div><div class="t">Tự hỏi ngẫu nhiên</div><div class="d">Tắt đi thì chỉ hỏi khi bạn bấm “Hỏi thử ngay”.</div></div>
+              <span class="toggle"><input type="checkbox" id="sEnabled" aria-label="Tự hỏi ngẫu nhiên"><span class="track"></span></span>
+            </div>
+            <div class="setting">
+              <div><div class="t">Tạm dừng video &amp; nhạc khi hỏi</div><div class="d">Áp dụng cho mọi tab (YouTube, Facebook…). Trả lời xong sẽ tự phát tiếp đúng những cái đang phát trước đó. Tắt đi thì nhạc vẫn chạy trong lúc bạn trả lời.</div></div>
+              <span class="toggle"><input type="checkbox" id="sPauseMedia" aria-label="Tạm dừng video và nhạc khi hỏi"><span class="track"></span></span>
+            </div>
+            <div class="row2">
+              <div class="field"><label class="flabel" for="sMin">Hỏi sau ít nhất (phút)</label><div class="tf"><input type="number" id="sMin" min="1" max="1440"></div></div>
+              <div class="field"><label class="flabel" for="sMax">Tối đa (phút)</label><div class="tf"><input type="number" id="sMax" min="1" max="1440"></div></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Kiểu câu hỏi</h2><p class="small subtlest">Mỗi lần hỏi sẽ chọn ngẫu nhiên một kiểu trong các kiểu đang bật.</p></div>
+            <div class="modes" id="modes"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Chấm bài</h2></div>
+            <label class="check"><input type="checkbox" id="sAccents"><span><span class="t">Chấp nhận gõ không dấu</span><span class="d">“pho bien” vẫn được tính là “phổ biến”.</span></span></label>
+            <div class="field" style="max-width:320px">
+              <label class="flabel" for="sAuto">Tự đánh dấu “đã thuộc” khi đúng liên tiếp</label>
+              <div class="tf"><input type="number" id="sAuto" min="0" max="50"></div>
+              <div class="helper">Số lần đúng liên tiếp. Để 0 nếu muốn tự đánh dấu bằng tay.</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Phát âm</h2></div>
+            <div class="field" style="max-width:320px">
+              <label class="flabel" for="sAccent">Giọng đọc</label>
+              <div class="tf"><select id="sAccent"><option value="us" data-desc="Giọng Mỹ — phổ biến nhất">Anh – Mỹ (US)</option><option value="uk" data-desc="Giọng Anh (British)">Anh – Anh (UK)</option></select></div>
+            </div>
+            <label class="check"><input type="checkbox" id="sAutoSpeak"><span><span class="t">Tự đọc từ khi màn hình hỏi hiện lên</span><span class="d">Không áp dụng cho kiểu “Đoán từ” và “Điền vào chỗ trống” để khỏi lộ đáp án.</span></span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= AI & GIỌNG NÓI ================= -->
+      <section class="page" id="page-ai" hidden>
+        <div class="crumbs">Vocab Lock / Cấu hình</div>
+        <div class="page-head"><div><h1 class="h1">AI &amp; giọng nói</h1><p class="page-desc">Không bắt buộc. Chưa cấu hình thì extension vẫn chạy miễn phí như bình thường.</p></div></div>
+        <div class="stack">
+          <div class="smsg"><span data-icon="lock"></span><div>Key chỉ được lưu trên máy này, chỉ gửi thẳng tới địa chỉ bạn cấu hình, và <b>không nằm trong file xuất đồng bộ</b>. Sang máy khác thì nhập lại key.</div></div>
+
+          <div class="ai-card" id="llmCard">
+            <div class="head">
+              <div class="logo"><span data-icon="sparkles"></span></div>
+              <div><div class="h3">Mô hình AI</div><div class="small subtlest">Gemini, ChatGPT, Claude, DeepSeek, OpenRouter, Groq, Ollama… hoặc bất kỳ API tương thích OpenAI</div></div>
+              <span class="lz" id="gStatus">Chưa cấu hình</span>
+            </div>
+            <div class="row2 wide">
+              <div class="field">
+                <label class="flabel" for="lPreset">Nhà cung cấp</label>
+                <div class="tf"><select id="lPreset"></select></div>
+              </div>
+              <div class="field">
+                <label class="flabel" for="lFormat">Định dạng API</label>
+                <div class="tf"><select id="lFormat"></select></div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="lBase">Base URL</label>
+              <div class="tf"><input type="url" id="lBase" placeholder="https://api.example.com/v1" autocomplete="off" spellcheck="false"></div>
+              <div class="helper" id="lBaseHelp">Dùng được cả proxy riêng hoặc máy chủ chạy trên máy (localhost).</div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="gKey">API key <span class="opt" id="lKeyOpt"></span></label>
+              <div class="tf"><input type="password" id="gKey" autocomplete="off" spellcheck="false"><button class="ibtn" type="button" data-reveal="gKey" title="Hiện / ẩn key"><span data-icon="eye"></span></button></div>
+              <div class="helper" id="lKeyHelp"></div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="lModel">Model</label>
+              <div class="keyrow">
+                <div class="tf"><input id="lModel" placeholder="vd: gpt-4o-mini, gemini-…-flash, claude-…" autocomplete="off" spellcheck="false"></div>
+                <button class="btn" id="lList" type="button"><span data-icon="sync"></span><span>Tải danh sách</span></button>
+              </div>
+              <datalist id="lModels" hidden></datalist>
+              <div class="helper">Gõ tên model bất kỳ, hoặc bấm “Tải danh sách” để chọn từ các model nhà cung cấp đang có.</div>
+            </div>
+            <div class="imsg" id="gMsg"></div>
+            <div class="keyrow">
+              <button class="btn primary" id="gSave" type="button">Lưu &amp; kiểm tra</button>
+              <button class="btn subtle" id="gClear" type="button" hidden>Xóa cấu hình</button>
+            </div>
+            <div class="divider"></div>
+            <div class="uses">
+              <div class="setting"><div><div class="t">Tự điền khi lưu từ</div><div class="d">Mở hộp lưu từ là AI điền sẵn nghĩa đúng ngữ cảnh, loại từ, câu ví dụ và cách đọc kiểu Việt.</div></div>
+                <span class="toggle"><input type="checkbox" id="sAiFill" aria-label="Tự điền khi lưu từ"><span class="track"></span></span></div>
+              <div class="setting"><div><div class="t">Chấm mềm câu trả lời</div><div class="d">Khi bạn trả lời khác chữ nhưng đúng ý (từ đồng nghĩa, diễn đạt khác) thì AI vẫn tính là đúng.</div></div>
+                <span class="toggle"><input type="checkbox" id="sAiGrade" aria-label="Chấm mềm câu trả lời"><span class="track"></span></span></div>
+              <div class="small subtlest">Kiểu câu hỏi “Điền vào chỗ trống” sẽ dùng AI để tạo câu mới mỗi lần — bật ở <a href="#settings">Cài đặt chung</a>.</div>
+            </div>
+          </div>
+
+          <div class="ai-card">
+            <div class="head">
+              <div class="logo"><span data-icon="mic"></span></div>
+              <div><div class="h3">Deepgram</div><div class="small subtlest">Nhận diện giọng nói: luyện phát âm, trả lời bằng giọng nói</div></div>
+              <span class="lz" id="dStatus">Chưa cấu hình</span>
+            </div>
+            <div class="field">
+              <label class="flabel" for="dKey">API key</label>
+              <div class="keyrow">
+                <div class="tf"><input type="password" id="dKey" placeholder="Deepgram API key" autocomplete="off" spellcheck="false"><button class="ibtn" type="button" data-reveal="dKey" title="Hiện / ẩn key"><span data-icon="eye"></span></button></div>
+                <button class="btn primary" id="dSave" type="button">Lưu &amp; kiểm tra</button>
+              </div>
+              <div class="helper">Tạo key tại <a href="https://console.deepgram.com" target="_blank" rel="noopener">console.deepgram.com</a>.</div>
+              <div class="imsg" id="dMsg"></div>
+            </div>
+            <div class="field" style="max-width:360px">
+              <label class="flabel" for="dModel">Model</label>
+              <div class="tf"><select id="dModel"><option value="nova-3" data-desc="Mới nhất, chính xác nhất">nova-3 (khuyên dùng)</option><option value="nova-2" data-desc="Bản cũ — dùng khi nova-3 không hỗ trợ ngôn ngữ">nova-2</option></select></div>
+            </div>
+            <div class="divider"></div>
+            <div class="setting">
+              <div><div class="t">Quyền dùng micro</div><div class="d" id="micDesc">Cần cấp một lần để extension thu âm khi bạn luyện nói.</div></div>
+              <button class="btn" id="micBtn" type="button"><span data-icon="mic"></span><span>Cấp quyền micro</span></button>
+            </div>
+            <div class="setting"><div><div class="t">Trả lời bằng giọng nói</div><div class="d">Hiện nút micro trong ô trả lời: nói nghĩa tiếng Việt (hoặc từ tiếng Anh) thay vì gõ.</div></div>
+              <span class="toggle"><input type="checkbox" id="sVoice" aria-label="Trả lời bằng giọng nói"><span class="track"></span></span></div>
+            <div class="small subtlest">Kiểu câu hỏi “Luyện phát âm” (đọc to từ để mở khóa) bật ở <a href="#settings">Cài đặt chung</a>. Đây là kiểm tra Deepgram có nghe ra đúng từ không, không chấm chi tiết từng âm.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= NHẬP & ĐỒNG BỘ ================= -->
+      <section class="page" id="page-sync" hidden>
+        <div class="crumbs">Vocab Lock / Dữ liệu</div>
+        <div class="page-head"><div><h1 class="h1">Nhập &amp; đồng bộ</h1><p class="page-desc">Thêm từ hàng loạt, nhập từ Excel / Google Sheets, sao lưu và chuyển dữ liệu giữa các máy.</p></div></div>
+        <div class="stack">
+          <div class="section">
+            <div class="section-head"><h2 class="h3" id="bulkTitle">Thêm nhiều từ</h2>
+              <p class="small subtlest">Mỗi dòng một từ. Cột nào không có thì để trống. Dán thẳng từ Excel / Google Sheets cũng được (các cột cách nhau bằng Tab).</p></div>
+            <div class="formats">
+              <div class="fmt"><div class="fmt-t">Dạng ngắn</div><code>cutover - quá trình cắt chuyển</code><div class="small subtlest">Dùng <code>-</code>, <code>=</code> hoặc <code>:</code>. Chỉ ghi từ tiếng Anh cũng được nếu bật AI điền.</div></div>
+              <div class="fmt"><div class="fmt-t">Dạng đầy đủ (cột cách nhau bằng <code>|</code>)</div>
+                <div class="cols" id="colList"></div>
+                <div class="small subtlest">Dòng đầu có thể là tiêu đề cột (vd <code>Từ | Nghĩa | Câu ví dụ</code>) — khi đó cột xếp thứ tự nào cũng được. Ghi chú muốn xuống dòng thì gõ <code>\n</code>.</div></div>
+            </div>
+            <div class="field" style="max-width:820px">
+              <div class="tf"><textarea id="bulk" class="mono" rows="8" spellcheck="false" placeholder="resilient - kiên cường, dẻo dai&#10;cutover | quá trình cắt chuyển | n | /ˈkʌtˌoʊvər/ | CẮT-âu-vơ | The final cutover is scheduled for midnight. | Việc chuyển đổi cuối cùng diễn ra lúc nửa đêm. | thuật ngữ IT&#10;impacts | ảnh hưởng, tác động | v"></textarea></div>
+              <div class="helper" id="bulkInfo"></div>
+            </div>
+            <label class="check" id="bulkAiRow" hidden><input type="checkbox" id="bulkAi" checked><span><span class="t">Dùng AI điền các cột còn trống</span><span class="d">Nghĩa, loại từ, cách đọc, câu ví dụ… Cột bạn đã điền thì giữ nguyên. Dòng chỉ có từ tiếng Anh cũng được.</span></span></label>
+            <div class="progress" id="bulkProgress" hidden><span class="spin"></span><span id="bulkProgressText"></span><button class="btn subtle" id="bulkStop" type="button">Dừng</button></div>
+            <div class="row-btns">
+              <button class="btn primary" id="bulkAdd" type="button"><span data-icon="plus"></span><span>Thêm vào danh sách</span></button>
+              <button class="btn subtle" id="template" type="button"><span data-icon="download"></span><span>Tải file mẫu (.csv)</span></button>
+            </div>
+          </div>
+
+          <div class="section" id="aiFillSection" hidden>
+            <div class="section-head"><h2 class="h3">Bổ sung thông tin bằng AI</h2>
+              <p class="small subtlest" id="aiFillDesc"></p></div>
+            <div class="progress" id="fillProgress" hidden><span class="spin"></span><span id="fillProgressText"></span><button class="btn subtle" id="fillStop" type="button">Dừng</button></div>
+            <div><button class="btn discovery" id="aiFillBtn" type="button"><span data-icon="sparkles"></span><span>Bổ sung bằng AI</span></button></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Nhập từ file</h2><p class="small subtlest">File <b>.json</b> xuất từ Vocab Lock, hoặc file <b>.csv</b> (Excel / Google Sheets → Tải xuống CSV) theo đúng các cột ở trên.</p></div>
+            <label class="check"><input type="radio" name="mode" value="merge" checked><span><span class="t">Gộp</span><span class="d">Thêm từ mới; từ trùng thì giữ bản được sửa gần nhất (file CSV: cập nhật theo file).</span></span></label>
+            <label class="check"><input type="radio" name="mode" value="replace"><span><span class="t">Thay thế toàn bộ</span><span class="d">Xóa danh sách hiện tại, dùng y nguyên dữ liệu trong file (file JSON kèm cả cài đặt).</span></span></label>
+            <div><label class="btn" for="importFile"><span data-icon="upload"></span><span>Chọn file để nhập (.json, .csv)</span></label>
+              <input type="file" id="importFile" accept=".json,.csv,.tsv,.txt,application/json,text/csv" hidden></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2 class="h3">Xuất dữ liệu</h2><p class="small subtlest">JSON: sao lưu đầy đủ (tiến độ học, cài đặt; không gồm API key) để chuyển sang máy khác. CSV: mở / sửa bằng Excel.</p></div>
+            <div class="row-btns">
+              <button class="btn primary" id="export" type="button"><span data-icon="download"></span><span>Xuất file JSON</span></button>
+              <button class="btn" id="exportCsv" type="button"><span data-icon="download"></span><span>Xuất file CSV</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="flags" id="flags" aria-live="polite"></div>
+
+  <script src="common.js"></script>
+  <script src="ui-select.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

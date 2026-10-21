@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Vocab Lock – Học từ vựng khi lướt web",
+  "short_name": "Vocab Lock",
+  "version": "2.5.0",
+  "description": "Lưu từ tiếng Anh kèm nghĩa tiếng Việt, thỉnh thoảng khóa trình duyệt hỏi lại nghĩa cho đến khi bạn trả lời đúng.",
+  "permissions": ["storage", "alarms", "contextMenus", "scripting", "offscreen", "tts"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Vocab Lock",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "commands": {
+    "save-selection": {
+      "suggested_key": { "default": "Alt+Shift+S" },
+      "description": "Lưu từ đang bôi đen vào Vocab Lock"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["common.js", "content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Hệ điều hành / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# File đóng gói & dữ liệu cá nhân xuất ra (có thể chứa danh sách từ của bạn)
+*.zip
+*.crx
+*.pem
+vocab-lock-*.json
+vocab-lock-*.csv
